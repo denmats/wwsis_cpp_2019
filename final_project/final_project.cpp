@@ -28,11 +28,10 @@ int main()
     cout << "Witaj w programie obrobki obrazow. Podaj nazwe obrazow do wczytania: ";
     cin >> nazwa_pliku_do_odczytu;
 
-    Wczytaj(nazwa_pliku_do_odczytu);
-    if(!errorOpenFile)
+    if(!Wczytaj(nazwa_pliku_do_odczytu))
     {
-        cout<<"Something wrong with this file or the file doesn't exist"<<endl;
-        exit(0);
+    cout<<"Something wrong with this file or the file does not exist"<<endl;
+    exit(0);
     }
     else cout<<"Obraz wczytano pomyslne"<<endl;
 
@@ -49,29 +48,36 @@ int main()
         cout<<endl;
 
         switch(userChoice)
-        {
-        case '1':
-            Negatyw();
-            cout<<"Podaj nazwe pliku do zapisu ";
-            cin>>nazwa_pliku_do_zapisu;
-            Zapisz(nazwa_pliku_do_zapisu);
-            break;
+            {
+            case '1':
+                Negatyw();
+                cout<<"Podaj nazwe pliku do zapisu ";
+                cin>>nazwa_pliku_do_zapisu;
+                if(Zapisz(nazwa_pliku_do_zapisu))
+                {
+                    cout<<"Obraz zapisano do pliku "<<nazwa_pliku_do_zapisu<<endl;
+                };
+                break;
 
-        case '2':
-            cout<<"Podaj wartosc progowania od 0 do " << adjust<<": ";
-            cin>>prog;
-            Progowanie(prog);
-            cout<<"Podaj nazwe pliku do zapisu ";
-            cin>>nazwa_pliku_do_zapisu;
-            Zapisz(nazwa_pliku_do_zapisu);
-            break;
-        case 'Q':
-            exit(0);
-        default:
-            cout<<"Zrobiles zly wybor. Sprobuj ponownie"<<endl;
-            break;
+            case '2':
+                cout<<"Podaj wartosc progowania od 0 do " << adjust<<": ";
+                cin>>prog;
+                Progowanie(prog);
+                cout<<"Podaj nazwe pliku do zapisu ";
+                cin>>nazwa_pliku_do_zapisu;
+                if(Zapisz(nazwa_pliku_do_zapisu))
+                {
+                    cout<<"Obraz zapisano do pliku "<<nazwa_pliku_do_zapisu<<endl;
+                };
+                break;
+            case 'Q':
+            case 'q':
+                exit(0);
+            default:
+                cout<<"Zrobiles zly wybor. Sprobuj ponownie"<<endl;
+                break;
+            }
         }
-    }
     garbageCollector(); //clean memory
     return 0;
 }
@@ -86,7 +92,7 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
     {
         errorOpenFile = false;
         cout<<"The file isn't opened"<<endl;
-        return 0;
+        return errorOpenFile;
     }
     else
     {
@@ -121,7 +127,7 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
         string tmp1s = tmp;
         m = atoi(tmp1s.c_str());
         string tmp2s = tmp;
-        int n = atoi(tmp2s.replace(0, 2,"").c_str());
+        n = atoi(tmp2s.replace(0, 2,"").c_str());
 
         //Take data from file tmp.pgm to array "tab[m][n]"
         //The data includes only array of numbers without the first four line
@@ -129,8 +135,9 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
         dane2.open("tmp.pgm");
         if(!dane2.good())
         {
+            errorOpenFile = false;
             cout << "The file isn't opened!" << endl;
-            return 0;
+            return errorOpenFile;
         }
         else
         {
@@ -154,6 +161,7 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
         dane1.close();
         dane.close();
     }
+    return errorOpenFile;
 }
 
 
@@ -165,12 +173,6 @@ bool Zapisz(string nazwa_pliku_do_zapisu)
     dane4 << comment <<endl;
     dane4 << tmp << endl;
     dane4 << adjust <<endl;
-
-    string tmp1s = tmp;
-    m = atoi(tmp1s.c_str());
-    string tmp2s = tmp;
-    int n = atoi(tmp2s.replace(0, 2,"").c_str());
-
 
     if(trigger == "Negotyw")
     {
@@ -194,18 +196,12 @@ bool Zapisz(string nazwa_pliku_do_zapisu)
             dane4<<endl;
         }
     }
-
     dane4.close();
-    cout<<"Obraz zapisano do pliku "<<nazwa_pliku_do_zapisu<<endl;
+    return true;
 }
 
 void Negatyw()
 {
-    string tmp1s = tmp;
-    m = atoi(tmp1s.c_str());
-    string tmp2s = tmp;
-    int n = atoi(tmp2s.replace(0, 2,"").c_str());
-
     ifstream dane3;
     dane3.open("tmp.pgm");
     if(!dane3.good())
@@ -252,11 +248,6 @@ void Negatyw()
 
 void Progowanie(int p)
 {
-    string tmp1s = tmp;
-    m = atoi(tmp1s.c_str());
-    string tmp2s = tmp;
-    int n = atoi(tmp2s.replace(0, 2,"").c_str());
-
     cout<<"Wartosc progowania wynosi: "<<prog<<endl;
 
     ifstream dane5;
@@ -282,7 +273,7 @@ void Progowanie(int p)
             }
         }
 
-        //Calculation Progowanie
+        //Calculation 'Progowanie'
         tabProg = new int *[n];
         for(int i = 0; i < n; i++)
         {
