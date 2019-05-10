@@ -18,6 +18,7 @@ int **tabNegatyw;
 int **tabProg;
 
 bool Wczytaj(string nazwa_pliku_do_odczytu);
+int getSize(string line);
 bool Zapisz(string nazwa_pliku_do_zapisu);
 void Negatyw();
 void Progowanie(int p);
@@ -101,6 +102,7 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
 
         //Read and write to variables the first four lines
         //Then rest of lines write to new file "tmp.pgm"
+        //**program solves two options: one - with comment, other - without comment
         while(getline(dane, line))
         {
             switch(counter)
@@ -109,13 +111,20 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
                 p2 = line;
                 break;
             case 2:
-                comment = line;
+                if(line.substr(0,1)!="#"){
+                    comment = "";
+                    tmp = line;
+                }else comment = line;
                 break;
             case 3:
-                tmp = line;
+                if(comment !=""){
+                    tmp = line;
+                }else adjust = atoi(line.c_str());
                 break;
             case 4:
-                adjust = atoi(line.c_str());
+                if(comment != ""){
+                    adjust = atoi(line.c_str());
+                }else dane1 << line <<endl;
                 break;
             default:
                 dane1 << line <<endl;
@@ -124,10 +133,7 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
         }
 
         //Pull out dimension of picture
-        string tmp1s = tmp;
-        m = atoi(tmp1s.c_str());
-        string tmp2s = tmp;
-        n = atoi(tmp2s.replace(0, 2,"").c_str());
+        getSize(tmp);
 
         //Take data from file tmp.pgm to array "tab[m][n]"
         //The data includes only array of numbers without the first four line
@@ -164,13 +170,23 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
     return errorOpenFile;
 }
 
+getSize(string line){
+        string delimeter = " ";
+        m = atoi(tmp.c_str());
+        string tmp1s = tmp.substr(tmp.find(delimeter),(tmp.length()-1));
+        n = atoi(tmp1s.c_str());
+}
+
+
 
 bool Zapisz(string nazwa_pliku_do_zapisu)
 {
     ofstream dane4;
     dane4.open(nazwa_pliku_do_zapisu.c_str());
     dane4 << p2 <<endl;
-    dane4 << comment <<endl;
+    if(comment != ""){
+        dane4 << comment <<endl;
+    }
     dane4 << tmp << endl;
     dane4 << adjust <<endl;
 
@@ -236,7 +252,7 @@ void Negatyw()
         {
             for(int j = 0; j < m; j++)
             {
-                tabNegatyw[i][j] = 15 - tab1[i][j];
+                tabNegatyw[i][j] = adjust - tab1[i][j];
             }
         }
 
