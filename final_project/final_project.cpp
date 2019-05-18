@@ -160,7 +160,6 @@ bool Wczytaj(string nazwa_pliku_do_odczytu)
                     dane2 >> tab[i][j];
                 }
             }
-            dane2.close();
         }
 
         dane2.close();
